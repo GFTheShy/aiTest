@@ -1,142 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-<meta charset="UTF-8">
-<title>AI电商爆款生成器</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
-}
-
-.container {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 20px;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.header h1 {
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-.header p {
-    color: #94a3b8;
-}
-
-.card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 8px;
-    border: none;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-}
-
-.generate-btn {
-    background: #3b82f6;
-    color: white;
-}
-
-.generate-btn:hover {
-    background: #2563eb;
-}
-
-.invite-btn {
-    background: #22c55e;
-    color: black;
-}
-
-.result {
-    margin-top: 20px;
-    background: #0b1220;
-    padding: 15px;
-    border-radius: 8px;
-    white-space: pre-wrap;
-    min-height: 120px;
-}
-
-.info {
-    margin-top: 10px;
-    font-size: 13px;
-    color: #94a3b8;
-}
-
-.badge {
-    display: inline-block;
-    background: #22c55e;
-    color: black;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    margin-bottom: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <div class="header">
-        <div class="badge">免费AI工具</div>
-        <h1>AI电商爆款生成器</h1>
-        <p>一键生成亚马逊 / TikTok 高转化商品内容</p>
-    </div>
-
-    <div class="card">
-
-        <input id="product" placeholder="输入商品名称，例如：无线蓝牙耳机" />
-
-        <button class="generate-btn" onclick="generate()">
-            生成爆款内容
-        </button>
-
-        <button class="invite-btn" onclick="invite()">
-            🎁 邀请好友 +5次
-        </button>
-
-        <div class="info" id="usageInfo"></div>
-
-        <div class="result" id="output">
-            请输入商品开始生成...
-        </div>
-
-    </div>
-</div>
-
 <script>
-const API_KEY = "YOUR_GROQ_API_KEY";
+const API_KEY = "sk-221d4ff14c244d579e43aa8762144764";
 
 // 初始化
 function init() {
     if (!localStorage.getItem("free")) {
-        localStorage.setItem("free", "3"); // 免费次数
+        localStorage.setItem("free", "3");
     }
     if (!localStorage.getItem("bonus")) {
         localStorage.setItem("bonus", "0");
@@ -144,42 +12,35 @@ function init() {
     updateUI();
 }
 
-// 获取总次数
 function getTotal() {
-    return parseInt(localStorage.getItem("free")) + parseInt(localStorage.getItem("bonus"));
+    return parseInt(localStorage.getItem("free")) +
+           parseInt(localStorage.getItem("bonus"));
 }
 
-// 消耗次数
 function consume() {
     let free = parseInt(localStorage.getItem("free"));
     let bonus = parseInt(localStorage.getItem("bonus"));
 
     if (bonus > 0) {
-        bonus -= 1;
-        localStorage.setItem("bonus", bonus);
+        localStorage.setItem("bonus", bonus - 1);
     } else {
-        free -= 1;
-        localStorage.setItem("free", free);
+        localStorage.setItem("free", free - 1);
     }
 }
 
-// 更新UI
 function updateUI() {
     document.getElementById("usageInfo").innerText =
-        `今日剩余次数：${getTotal()}（免费 + 邀请奖励）`;
+        `剩余次数：${getTotal()}`;
 }
 
-// 邀请
 function invite() {
     let bonus = parseInt(localStorage.getItem("bonus"));
-    bonus += 5;
-    localStorage.setItem("bonus", bonus);
+    localStorage.setItem("bonus", bonus + 5);
 
-    alert("🎉 邀请成功 +5次生成次数！");
+    alert("🎉 邀请成功 +5 次！");
     updateUI();
 }
 
-// 生成内容
 async function generate() {
     init();
 
@@ -187,46 +48,44 @@ async function generate() {
     const output = document.getElementById("output");
 
     if (getTotal() <= 0) {
-        output.innerText = "❌ 今日次数已用完，邀请好友可获得更多次数";
+        output.innerText = "次数已用完，邀请好友可增加次数";
         return;
     }
 
     if (!product) {
-        output.innerText = "请输入商品名称";
+        output.innerText = "请输入商品";
         return;
     }
 
-    output.innerText = "生成中，请稍等...";
+    output.innerText = "生成中...";
 
     consume();
     updateUI();
 
     try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + API_KEY
             },
             body: JSON.stringify({
-                model: "llama3-70b-8192",
+                model: "deepseek-chat",
                 messages: [
                     {
                         role: "system",
-                        content: "你是一个资深跨境电商文案专家，擅长写高转化亚马逊和TikTok商品文案。"
+                        content: "你是一个资深跨境电商文案专家"
                     },
                     {
                         role: "user",
                         content: `
-生成高转化电商内容：
-
 商品：${product}
 
-请输出：
-1. 亚马逊爆款标题（3个）
-2. TikTok吸引点击标题（3个）
-3. 商品描述（带购买欲望）
-4. 20个SEO标签
+生成：
+1. 亚马逊标题（3个）
+2. TikTok标题（3个）
+3. 商品描述
+4. 20个标签
                         `
                     }
                 ]
@@ -238,17 +97,13 @@ async function generate() {
         if (data.choices && data.choices.length > 0) {
             output.innerText = data.choices[0].message.content;
         } else {
-            output.innerText = "生成失败，请重试";
+            output.innerText = "生成失败：" + JSON.stringify(data);
         }
 
-    } catch (e) {
-        output.innerText = "网络错误：" + e.message;
+    } catch (err) {
+        output.innerText = "请求错误：" + err.message;
     }
 }
 
-// 初始化执行
 init();
 </script>
-
-</body>
-</html>
