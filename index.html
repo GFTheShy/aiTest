@@ -1,5 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>AI电商爆款生成器</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 30px;
+}
+
+.header p {
+    color: #94a3b8;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.generate {
+    background: #3b82f6;
+    color: white;
+}
+
+.generate:hover {
+    background: #2563eb;
+}
+
+.invite {
+    background: #22c55e;
+    color: black;
+}
+
+.result {
+    margin-top: 20px;
+    background: #0b1220;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    min-height: 120px;
+}
+
+.info {
+    margin-top: 10px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.badge {
+    display: inline-block;
+    background: #22c55e;
+    color: black;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="badge">免费AI工具</div>
+        <h1>AI电商爆款生成器</h1>
+        <p>一键生成亚马逊 / TikTok 爆款商品文案</p>
+    </div>
+
+    <div class="card">
+
+        <input id="product" placeholder="输入商品名称（例如：无线耳机）" />
+
+        <button class="generate" onclick="generate()">生成爆款内容</button>
+
+        <button class="invite" onclick="invite()">🎁 邀请好友 +5次</button>
+
+        <div class="info" id="info"></div>
+
+        <div class="result" id="output">请输入商品开始生成...</div>
+
+    </div>
+</div>
+
 <script>
-const API_KEY = "sk-221d4ff14c244d579e43aa8762144764";
+const API_KEY = "替换成你的DeepSeek_API_KEY";
 
 // 初始化
 function init() {
@@ -29,8 +152,8 @@ function consume() {
 }
 
 function updateUI() {
-    document.getElementById("usageInfo").innerText =
-        `剩余次数：${getTotal()}`;
+    document.getElementById("info").innerText =
+        "剩余次数：" + getTotal();
 }
 
 function invite() {
@@ -48,12 +171,12 @@ async function generate() {
     const output = document.getElementById("output");
 
     if (getTotal() <= 0) {
-        output.innerText = "次数已用完，邀请好友可增加次数";
+        output.innerText = "❌ 次数已用完，邀请好友可增加次数";
         return;
     }
 
     if (!product) {
-        output.innerText = "请输入商品";
+        output.innerText = "请输入商品名称";
         return;
     }
 
@@ -74,18 +197,18 @@ async function generate() {
                 messages: [
                     {
                         role: "system",
-                        content: "你是一个资深跨境电商文案专家"
+                        content: "你是资深跨境电商文案专家，擅长写高转化亚马逊和TikTok爆款文案"
                     },
                     {
                         role: "user",
                         content: `
 商品：${product}
 
-生成：
-1. 亚马逊标题（3个）
-2. TikTok标题（3个）
-3. 商品描述
-4. 20个标签
+请生成：
+1. 亚马逊爆款标题（3个）
+2. TikTok吸引点击标题（3个）
+3. 商品描述（提升购买欲）
+4. 20个SEO标签
                         `
                     }
                 ]
@@ -107,3 +230,6 @@ async function generate() {
 
 init();
 </script>
+
+</body>
+</html>
