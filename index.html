@@ -1,24 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Free AI Listing Generator</title>
-  <style>
-    body { font-family: Arial; max-width: 800px; margin: 50px auto; }
-    input, button { padding: 12px; width: 100%; margin: 10px 0; }
-    button { cursor: pointer; }
-    pre { background: #f4f4f4; padding: 15px; white-space: pre-wrap; }
-  </style>
+<meta charset="UTF-8">
+<title>AI Listing Studio</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #94a3b8;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #3b82f6;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2563eb;
+}
+
+.result {
+    margin-top: 20px;
+    background: #0b1220;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+.tags {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.badge {
+    display: inline-block;
+    background: #22c55e;
+    color: black;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<h2>🔥 Free AI Product Listing Generator</h2>
+<div class="container">
 
-<input id="product" placeholder="Enter product (e.g. wireless earphone)" />
-<button onclick="generate()">Generate</button>
+    <div class="header">
+        <div class="badge">AI POWERED</div>
+        <h1>Amazon & TikTok Listing Generator</h1>
+        <p>Generate high-converting product listings in seconds</p>
+    </div>
 
-<pre id="output"></pre>
+    <div class="card">
+
+        <input id="product" placeholder="Enter product (e.g. wireless earphone)" />
+
+        <button onclick="generate()">Generate High-Converting Listings</button>
+
+        <div class="result" id="output">Your results will appear here...</div>
+
+        <div class="tags">
+            ✨ Amazon Titles • TikTok Hooks • SEO Descriptions • Hashtags
+        </div>
+
+    </div>
+</div>
 
 <script>
 const API_KEY = "YOUR_GROQ_API_KEY";
@@ -27,7 +121,7 @@ async function generate() {
     const product = document.getElementById("product").value;
     const output = document.getElementById("output");
 
-    output.innerText = "Generating...";
+    output.innerText = "Generating high-converting listings...";
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
@@ -40,17 +134,23 @@ async function generate() {
             messages: [
                 {
                     role: "system",
-                    content: "You are an expert Amazon and TikTok ecommerce copywriter."
+                    content: "You are a senior Amazon + TikTok ecommerce copywriter who writes high-conversion listings."
                 },
                 {
                     role: "user",
-                    content: `Generate:
-1. 3 Amazon product titles
-2. 3 TikTok viral titles
-3. Product description
-4. 20 hashtags
+                    content: `
+Create HIGH-CONVERTING ecommerce content:
 
-Product: ${product}`
+Product: ${product}
+
+Output format:
+1. Amazon Titles (3)
+2. TikTok Viral Hooks (3)
+3. Product Description (persuasive)
+4. 20 SEO Hashtags
+
+Make it sound like a real $1M selling product.
+`
                 }
             ]
         })
