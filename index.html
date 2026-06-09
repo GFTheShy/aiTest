@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>AI Listing Studio</title>
+<title>AI电商爆款生成器</title>
 
 <style>
 body {
@@ -20,11 +20,11 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .header h1 {
-    font-size: 32px;
+    font-size: 30px;
     margin-bottom: 10px;
 }
 
@@ -50,17 +50,26 @@ input {
 
 button {
     width: 100%;
-    padding: 14px;
-    background: #3b82f6;
+    padding: 12px;
+    margin-top: 8px;
     border: none;
-    color: white;
-    font-size: 16px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 15px;
 }
 
-button:hover {
+.generate-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.generate-btn:hover {
     background: #2563eb;
+}
+
+.invite-btn {
+    background: #22c55e;
+    color: black;
 }
 
 .result {
@@ -69,11 +78,12 @@ button:hover {
     padding: 15px;
     border-radius: 8px;
     white-space: pre-wrap;
+    min-height: 120px;
 }
 
-.tags {
+.info {
     margin-top: 10px;
-    font-size: 12px;
+    font-size: 13px;
     color: #94a3b8;
 }
 
@@ -81,7 +91,7 @@ button:hover {
     display: inline-block;
     background: #22c55e;
     color: black;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 6px;
     font-size: 12px;
     margin-bottom: 10px;
@@ -94,21 +104,27 @@ button:hover {
 <div class="container">
 
     <div class="header">
-        <div class="badge">AI POWERED</div>
-        <h1>Amazon & TikTok Listing Generator</h1>
-        <p>Generate high-converting product listings in seconds</p>
+        <div class="badge">免费AI工具</div>
+        <h1>AI电商爆款生成器</h1>
+        <p>一键生成亚马逊 / TikTok 高转化商品内容</p>
     </div>
 
     <div class="card">
 
-        <input id="product" placeholder="Enter product (e.g. wireless earphone)" />
+        <input id="product" placeholder="输入商品名称，例如：无线蓝牙耳机" />
 
-        <button onclick="generate()">Generate High-Converting Listings</button>
+        <button class="generate-btn" onclick="generate()">
+            生成爆款内容
+        </button>
 
-        <div class="result" id="output">Your results will appear here...</div>
+        <button class="invite-btn" onclick="invite()">
+            🎁 邀请好友 +5次
+        </button>
 
-        <div class="tags">
-            ✨ Amazon Titles • TikTok Hooks • SEO Descriptions • Hashtags
+        <div class="info" id="usageInfo"></div>
+
+        <div class="result" id="output">
+            请输入商品开始生成...
         </div>
 
     </div>
@@ -117,53 +133,121 @@ button:hover {
 <script>
 const API_KEY = "YOUR_GROQ_API_KEY";
 
+// 初始化
+function init() {
+    if (!localStorage.getItem("free")) {
+        localStorage.setItem("free", "3"); // 免费次数
+    }
+    if (!localStorage.getItem("bonus")) {
+        localStorage.setItem("bonus", "0");
+    }
+    updateUI();
+}
+
+// 获取总次数
+function getTotal() {
+    return parseInt(localStorage.getItem("free")) + parseInt(localStorage.getItem("bonus"));
+}
+
+// 消耗次数
+function consume() {
+    let free = parseInt(localStorage.getItem("free"));
+    let bonus = parseInt(localStorage.getItem("bonus"));
+
+    if (bonus > 0) {
+        bonus -= 1;
+        localStorage.setItem("bonus", bonus);
+    } else {
+        free -= 1;
+        localStorage.setItem("free", free);
+    }
+}
+
+// 更新UI
+function updateUI() {
+    document.getElementById("usageInfo").innerText =
+        `今日剩余次数：${getTotal()}（免费 + 邀请奖励）`;
+}
+
+// 邀请
+function invite() {
+    let bonus = parseInt(localStorage.getItem("bonus"));
+    bonus += 5;
+    localStorage.setItem("bonus", bonus);
+
+    alert("🎉 邀请成功 +5次生成次数！");
+    updateUI();
+}
+
+// 生成内容
 async function generate() {
+    init();
+
     const product = document.getElementById("product").value;
     const output = document.getElementById("output");
 
-    output.innerText = "Generating high-converting listings...";
+    if (getTotal() <= 0) {
+        output.innerText = "❌ 今日次数已用完，邀请好友可获得更多次数";
+        return;
+    }
 
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + API_KEY
-        },
-        body: JSON.stringify({
-            model: "llama3-70b-8192",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a senior Amazon + TikTok ecommerce copywriter who writes high-conversion listings."
-                },
-                {
-                    role: "user",
-                    content: `
-Create HIGH-CONVERTING ecommerce content:
+    if (!product) {
+        output.innerText = "请输入商品名称";
+        return;
+    }
 
-Product: ${product}
+    output.innerText = "生成中，请稍等...";
 
-Output format:
-1. Amazon Titles (3)
-2. TikTok Viral Hooks (3)
-3. Product Description (persuasive)
-4. 20 SEO Hashtags
+    consume();
+    updateUI();
 
-Make it sound like a real $1M selling product.
-`
-                }
-            ]
-        })
-    });
+    try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + API_KEY
+            },
+            body: JSON.stringify({
+                model: "llama3-70b-8192",
+                messages: [
+                    {
+                        role: "system",
+                        content: "你是一个资深跨境电商文案专家，擅长写高转化亚马逊和TikTok商品文案。"
+                    },
+                    {
+                        role: "user",
+                        content: `
+生成高转化电商内容：
 
-    const data = await res.json();
+商品：${product}
 
-    if (data.choices && data.choices.length > 0) {
-        output.innerText = data.choices[0].message.content;
-    } else {
-        output.innerText = "Error: " + JSON.stringify(data);
+请输出：
+1. 亚马逊爆款标题（3个）
+2. TikTok吸引点击标题（3个）
+3. 商品描述（带购买欲望）
+4. 20个SEO标签
+                        `
+                    }
+                ]
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.choices && data.choices.length > 0) {
+            output.innerText = data.choices[0].message.content;
+        } else {
+            output.innerText = "生成失败，请重试";
+        }
+
+    } catch (e) {
+        output.innerText = "网络错误：" + e.message;
     }
 }
+
+// 初始化执行
+init();
 </script>
 
 </body>
